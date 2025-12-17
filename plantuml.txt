@@ -1,0 +1,202 @@
+@startuml
+!theme blueprint
+skinparam linetype ortho
+
+' ======================
+'       USERS & ROLES
+' ======================
+entity users {
+  *id : int
+  --
+  name : varchar
+  username : varchar
+  password : varchar
+  refreshToken: varchar
+  active : boolean
+}
+
+entity roles {
+  *id : int
+  --
+  role : varchar
+}
+
+entity user_branches {
+  *id : int
+  --
+  user_id : int
+  branch_id : int
+  role_id : int
+}
+
+users ||--o{ user_branches
+roles ||--o{ user_branches
+
+' ======================
+'        BRANCHES
+' ======================
+entity branches {
+  *id : int
+  --
+  name : varchar
+  address : varchar
+}
+
+' ======================
+'        PRODUCTS
+' ======================
+entity categories {
+  *id : int
+  --
+  name : varchar
+  description : varchar
+}
+
+entity products {
+  *id : int
+  --
+  name : varchar
+  description : varchar
+  category_id : int
+  active : boolean
+}
+
+entity variants {
+  *id : int
+  --
+  product_id : int
+  sku : varchar
+  price : decimal
+  active : boolean
+}
+
+entity variant_attributes {
+  *id : int
+  --
+  variant_id : int
+  attribute_name : varchar
+  attribute_value : varchar
+}
+
+products ||--o{ variants
+variants ||--o{ variant_attributes
+categories ||--o{ products
+
+' ======================
+'      INVENTORY
+' ======================
+entity inventory {
+  *id : int
+  --
+  branch_id : int
+  variant_id : int
+  qty : int
+}
+
+entity inventory_movements {
+  *id : int
+  --
+  branch_id : int
+  variant_id : int
+  qty : int
+  movement_type : varchar
+  reference_id : int
+  timestamp : datetime
+}
+
+branches ||--o{ inventory
+variants ||--o{ inventory
+
+branches ||--o{ inventory_movements
+variants ||--o{ inventory_movements
+
+' ======================
+'    CUSTOMERS & ORDERS
+' ======================
+entity customers {
+  *id : int
+  --
+  name : varchar
+  lastname : varchar
+  address : varchar
+}
+
+entity orders {
+  *id : int
+  --
+  customer_id : int
+  order_date : date
+  paid : boolean
+  status : varchar
+}
+
+entity order_items {
+  *id : int
+  --
+  order_id : int
+  variant_id : int
+  qty : int
+  unit_price : decimal
+}
+
+customers ||--o{ orders
+orders ||--o{ order_items
+variants ||--o{ order_items
+
+' ======================
+'        SUPPLIERS
+' ======================
+entity suppliers {
+  *id : int
+  --
+  name : varchar
+  address : varchar
+  phone : varchar
+  contact_name : varchar
+}
+
+' ======================
+'      PURCHASE ORDERS
+' ======================
+entity purchase_orders {
+  *id : int
+  --
+  supplier_id : int
+  branch_id : int
+  order_date : date
+  status : varchar
+  received_date : date
+}
+
+entity purchase_order_items {
+  *id : int
+  --
+  purchase_order_id : int
+  variant_id : int
+  qty_ordered : int
+  qty_received : int
+  unit_cost : decimal
+}
+
+suppliers ||--o{ purchase_orders
+branches ||--o{ purchase_orders
+
+purchase_orders ||--o{ purchase_order_items
+variants ||--o{ purchase_order_items
+
+' ======================
+'        LOGS
+' ======================
+entity logs {
+  *id : int
+  --
+  user_id : int
+  table_name : varchar
+  record_id : int
+  action : varchar
+  changes : text
+  timestamp : datetime
+}
+
+users ||--o{ logs
+@enduml
